@@ -29,16 +29,15 @@ ModuloExtraServer = function(id, producto = id){
                  })
                  
                  # Alerta Archivo subido
-                 observeEvent(input$archivo, {
-                   # print(input$archivo)
-                   if(endsWith(input$archivo$datapath,".xlsx")){
-                     show_alert(
+                 observeEvent(!is.null(input$archivo),
+                 {
+                   # print("fuera...")
+                   show_alert(
                        title = "Carga Exitosa !!",
-                       text = "Los datos de la cartera se cargaron exitosamente.",
+                       text = "Los datos se cargaron exitosamente.",
+                       showCloseButton = TRUE,
                        type = "success"
-                     )
-                   }
-                   
+                   )
                    
                  })
                  
@@ -128,7 +127,7 @@ ModuloExtraServer = function(id, producto = id){
                    
                  })
                  
-                 # Duracion vs Cuantia .................
+                 # Duracion vs Prima Pura .................
                  output$graf_dura_cuant = renderHighchart({
                    
                    df0 = df_cartera
@@ -136,20 +135,20 @@ ModuloExtraServer = function(id, producto = id){
                    if(!is.null(input$archivo$datapath)) df0 = datos()
                    
                    hc = df0 %>% 
-                     hchart('scatter', hcaes(x = duracion, y = cuantia, group = Sexo),regression = TRUE) %>%
+                     hchart('scatter', hcaes(x = duracion, y = prima_pura, group = Sexo),regression = TRUE) %>%
                      hc_colors(c("#00AFBB", "#E7B800"))%>% 
                      hc_add_dependency("plugins/highcharts-regression.js")
                  })
                  
                  # Gastos Internos vs Externos  ..............
-                 output$graf_gastos = renderHighchart({
+                 output$graf_prima_edad = renderHighchart({
                    
                    df0 = df_cartera
                    # shiny::req(input$archivo)
                    if(!is.null(input$archivo$datapath)) df0 = datos()
                    
                    hc = df0 %>% 
-                     hchart('scatter', hcaes(x = gastos_internos, y = gastos_externos, group = Sexo),regression = TRUE) %>%
+                     hchart('scatter', hcaes(x = Edad, y = prima_pura, group = Sexo),regression = TRUE) %>%
                      hc_colors(c("#00AFBB", "#E7B800"))%>% 
                      hc_add_dependency("plugins/highcharts-regression.js")
                  })

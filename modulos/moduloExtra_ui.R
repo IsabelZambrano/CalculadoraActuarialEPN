@@ -16,7 +16,7 @@ ModuloExtraUI = function(id = "i_producto", titulo="Titulo_Pestania"){
             
             
             # CAJA  ......................................
-            box(title = "Datos Cartera",status = "info",
+            box(title = "Datos Cartera",status = "primary",
                 solidHeader = FALSE,collapsible = TRUE,
                 
                 # Subida Archivos
@@ -78,7 +78,7 @@ ModuloExtraUI = function(id = "i_producto", titulo="Titulo_Pestania"){
             ),
             
             # Grafica PRIMAS AGREGADAS   ....................
-            box(title = "PRIMAS: Valores Agregados Primas",status = "success",
+            box(title = "PRIMAS: Valores Agregados por Producto",status = "success",
                 solidHeader = FALSE,collapsible = TRUE,
                 
                 plotlyOutput(outputId = ns('graf_prima_prod'))
@@ -88,7 +88,7 @@ ModuloExtraUI = function(id = "i_producto", titulo="Titulo_Pestania"){
             
             
             # CAJA  ......................................
-            box(title = "Cuantía y Edad vs Sexo",status = "info",
+            box(title = "Cuantía y Edad vs Sexo",status = "success",
                 solidHeader = FALSE,collapsible = TRUE,
                 # h3('bbbb'),
                 fluidRow(
@@ -103,16 +103,17 @@ ModuloExtraUI = function(id = "i_producto", titulo="Titulo_Pestania"){
             
             
             # CAJA  ......................................
-            box(title = "Duración vs Cuantía",status = "info",
+            box(title = "Duración vs Prima Pura",status = "success",
                 solidHeader = FALSE,collapsible = TRUE,
                 # h3('dddd')
                 highchartOutput(outputId = ns('graf_dura_cuant'))
             ),
+            
             # CAJA  ......................................
-            box(title = "Gastos Internos vs Externos",status = "info",
+            box(title = "Edad vs Prima Pura",status = "success",
                 solidHeader = FALSE,collapsible = TRUE,
                 # h3('dddd')
-                highchartOutput(outputId = ns('graf_gastos'))
+                highchartOutput(outputId = ns('graf_prima_edad'))
             )
             
             

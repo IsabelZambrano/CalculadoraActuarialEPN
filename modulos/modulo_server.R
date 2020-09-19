@@ -9,6 +9,22 @@ ModuloServer = function(id, producto = id){
                # Empieza Servidor Modulo  ..................................
                function(input,output,session){
                  
+                 # PopUp Guia de usuario
+                 observeEvent(input$informacion,{
+
+                   # Textos estan en: codigo/info    ....................
+                   sendSweetAlert(
+                     title = TextoTitulo(producto),
+                     session = session,
+                     text = TextoInformacion(producto),
+                     html = TRUE,
+                     showCloseButton = TRUE,
+                     # btn_colors = "#5dade2",
+                     type = "info"
+                   )
+
+                 })
+                 
                  # Actualizar SelectInput tipo_fraccion  ...................
                  
                  observe({
@@ -43,12 +59,29 @@ ModuloServer = function(id, producto = id){
                    return(widg_tipo_seg)
                  })
                  
+                 # Actualizar Widget Tipo RENTA  ..........................
+                 output$wid_tipo_renta = renderUI({
+                   ns = session$ns
+                   if(producto == '2_prepagables'|producto=='2_pospagables'){
+                     widg_tipo_rnt = selectInput(inputId = ns('tipo_renta'),
+                                                 label='Tipo de Renta:',
+                                                 choices = c('Vitalicia',
+                                                             'Temporal'), 
+                                                 width='90%')
+                   }else{
+                     widg_tipo_rnt = NULL
+                   }
+                   return(widg_tipo_rnt)
+                 })
+                 
                  # Actualizar Widget Duracion  ..........................
                  output$wid_duracion = renderUI({
                    ns = session$ns
                    Tipo_seguro = input$tipo_seguro
+                   Tipo_renta = input$tipo_renta
                    if(is.null(Tipo_seguro)) Tipo_seguro = 'Temporal'
-                   if(Tipo_seguro=='Temporal'){
+                   if(is.null(Tipo_renta)) Tipo_renta = 'Temporal'
+                   if(Tipo_seguro=='Temporal' & Tipo_renta == 'Temporal'){
                      wid_dura = numericInput(inputId = ns('duracion'), 
                                              label = 'Cobertura (en años):',  #Duración de Prestación
                                              value = 1, min = 1, max = 95, step = NA, width='90%')
@@ -167,6 +200,12 @@ ModuloServer = function(id, producto = id){
                    }) 
                    
                    try({
+                     Tipo_renta = 'Vitalicia'
+                     shiny::req(input$tipo_renta)
+                     Tipo_renta = input$tipo_renta
+                   }) 
+                   
+                   try({
                      shiny::req(input$edad)
                      Edad = input$edad
                      Edad = age(as.Date(Edad))
@@ -257,7 +296,8 @@ ModuloServer = function(id, producto = id){
                                                Seleccion_frac = Seleccion_frac,
                                                Fraccion = Fraccion,
                                                Tipo_seguro = Tipo_seguro,
-                                               Diferido = Diferido)
+                                               Diferido = Diferido,
+                                               Tipo_renta = Tipo_renta)
                    # calculos = calculo_producto(producto,Edad)
                    return(calculos)
                  })
@@ -389,7 +429,7 @@ ModuloServer = function(id, producto = id){
                    if(is.null(Tipo_seguro)) Tipo_seguro = 'Temporal'
                    
                    # Wiget de Grafico Reserva ......
-                   if(Tipo_seguro=='Temporal' & Seleccion_frac=='No' & producto!='1_cuantia_variable'){
+                   if(Seleccion_frac=='No' & producto!='1_cuantia_variable'){
                      wid_reser = highchartOutput(ns('graf_reserva'))
                    }else{
                      wid_reser = br()
@@ -400,22 +440,53 @@ ModuloServer = function(id, producto = id){
                  # Grafico Reserva ......................
                  output$graf_reserva = renderHighchart({
                    if (is.null(resultado())) return(NULL)
+                   Duracion = NULL
+                   df1 = NULL
                    
+                   try({Duracion = input$duracion})
+                   try({df1 = data.frame(t = 0:Duracion, Reserva = resultado()$reserva )})
+                   
+                   # Segun tipo Seguro .........
                    try({
-                     Duracion = NULL
                      Duracion = input$duracion
+                     shiny::req(input$tipo_seguro)
+                     if(input$tipo_seguro == 'Entera') {
+                       if(producto == '1_fallecimiento') Duracion = 95 - age(input$edad)
+                       if(producto == '1_diferido') Duracion = 95 - age(input$edad) - input$diferido
+                       # print("seguro...")
+                       df1 = data.frame(t = 0:Duracion, Reserva = resultado()$reserva)
+                     }
+                     
                    })
-                   if(is.null(resultado()$reserva)){
-                     df = data.frame(t = 0:Duracion, Reserva = NA)
+                   
+                   # Segun Tipo Renta ...........
+                   try({
+                     Duracion = input$duracion
+                     
+                     if(producto == '2_prepagables'|producto=='2_pospagables') {
+                       
+                       if(input$tipo_renta == 'Vitalicia'){
+                         Duracion = 95 - age(input$edad)
+                       }
+                       # print("renta....")
+                       df1 = data.frame(t = 0:Duracion, Reserva = resultado()$reserva )
+                       
+                     }
+                   })
+                   # ................................
+                   # print("df1=")
+                   # print(head(df1))
+                   #
+                   if(is.null(df1)){
+                     return(NULL)
                    }else{
-                     df = data.frame(t = 0:Duracion, Reserva = resultado()$reserva )
+                     hchart(df1,type = "area",
+                            hcaes(x = t, y = Reserva),
+                            name = "Reserva",
+                            color = "#c39bd3",
+                            showInLegend = TRUE
+                     )
                    }
-                   hchart(df,type = "area",
-                          hcaes(x = t, y = Reserva),
-                          name = "Reserva",
-                          color = "#c39bd3",
-                          showInLegend = TRUE
-                   )
                  })
                  
                  

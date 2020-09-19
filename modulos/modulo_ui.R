@@ -11,16 +11,32 @@ ModuloUI = function(id = "i_producto", titulo="Titulo_Pestania"){
   #............................................................
   tabItem(tabName = id,
           h3(titulo), #hr(),
+          
           fluidRow(
             # PANEL DE PARAMETROS ............
             # sidebarPanel( # Se cambio por box()
             box(title = "Parámetros",status = "primary",
                 solidHeader = FALSE,collapsible = TRUE,
+                
+                # PorUp Informacion del Producto ..............
+                actionBttn(
+                  inputId = ns("informacion"),
+                  label = "Guía de Usuario",
+                  style = "jelly", #"pill",'unite','material-flat','minimal','stretch','fill'
+                  icon = icon('info'),
+                  color = "primary"
+                ),br(),br(),
+                
+                
+                # Contenedor Parametros
                 fluidRow(
+                  
                   column(6,
                          # Tipo de Seguro
                          uiOutput(outputId = ns("wid_tipo_seguro")),
                          
+                         # Tipo de Renta
+                         uiOutput(outputId = ns("wid_tipo_renta")),
                          
                          # Widgets COMUNES ................................
                          
@@ -31,7 +47,7 @@ ModuloUI = function(id = "i_producto", titulo="Titulo_Pestania"){
                                    min = as.character(Sys.Date()-98*365), 
                                    max = as.character(Sys.Date()-18*365), 
                                    format = "yyyy-mm-dd", 
-                                   startview = "year", 
+                                   startview = "decade", 
                                    weekstart = 0, language = "es", width='90%'),
                          # Sexo
                          radioButtons(inputId = ns('sexo'),

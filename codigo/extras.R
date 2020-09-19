@@ -44,6 +44,14 @@ Reserva = function(producto,t,l,tabla,Cuantia,Edad,Duracion,Tipo_interes,Diferid
                     '1_diferido' = {
                       Cuantia*Axn(tabla, x=Edad+t, n=Duracion-t, i=Tipo_interes, m=Diferido, k=1) - 
                         PNivel*axn(tabla, x=Edad+t, n=Duracion-t, i=Tipo_interes, m=Diferido, payment = "immediate", k=1)
+                    },
+                    '2_prepagables' = {
+                      Cuantia*axn(tabla, x=Edad+t, n=Duracion-t, i=Tipo_interes, m=0, k=1, payment = "due") - 
+                        PNivel*axn(tabla, x=Edad+t, n=Duracion-t, i=Tipo_interes, m=0, payment = "immediate", k=1)
+                    },
+                    '2_pospagables' = {
+                      Cuantia*axn(tabla, x=Edad+t, n=Duracion-t, i=Tipo_interes, m=0, k=1, payment = "immediate") - 
+                        PNivel*axn(tabla, x=Edad+t, n=Duracion-t, i=Tipo_interes, m=0, payment = "immediate", k=1)
                     }
                     
   )
@@ -111,4 +119,5 @@ limpieza_cartera = function(df0,Tipo_interes){
   }
   return(df0)
 }
+
 
